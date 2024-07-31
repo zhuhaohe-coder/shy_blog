@@ -1,8 +1,10 @@
 'use client'
 
-import { Fragment, useEffect, useState } from 'react'
+import { Fragment, useEffect, useState, useRef } from 'react'
 import { useTheme } from 'next-themes'
 import { Menu, RadioGroup, Transition } from '@headlessui/react'
+
+import { viewTransition } from 'utils'
 
 const Sun = () => (
   <svg
@@ -34,9 +36,9 @@ const Monitor = () => (
     viewBox="0 0 20 20"
     fill="none"
     stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
     className="group:hover:text-gray-100 h-6 w-6"
   >
     <rect x="3" y="3" width="14" height="10" rx="2" ry="2"></rect>
@@ -49,12 +51,23 @@ const Blank = () => <svg className="h-6 w-6" />
 const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false)
   const { theme, setTheme, resolvedTheme } = useTheme()
+  const switchButtonRef = useRef(null)
 
   // When mounted on client, now we can show the UI
   useEffect(() => setMounted(true), [])
 
+  const setThemeWithAnimation = (theme: string) => {
+    const root = document.documentElement
+    const offsetX = (switchButtonRef.current as unknown as HTMLDivElement).offsetLeft
+    const offsetY = (switchButtonRef.current as unknown as HTMLDivElement).offsetTop
+    root.style.setProperty('--x', `${offsetX}px`)
+    root.style.setProperty('--y', `${offsetY}px`)
+    // setTheme(theme)
+    viewTransition(() => setTheme(theme), theme)
+  }
+
   return (
-    <div className="mr-5 flex items-center">
+    <div className="mr-5 flex items-center" ref={switchButtonRef}>
       <Menu as="div" className="relative inline-block text-left">
         <div className="flex items-center justify-center hover:text-primary-500 dark:hover:text-primary-400">
           <Menu.Button>
@@ -71,7 +84,7 @@ const ThemeSwitch = () => {
           leaveTo="transform opacity-0 scale-95"
         >
           <Menu.Items className="absolute right-0 z-50 mt-2 w-32 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
-            <RadioGroup value={theme} onChange={setTheme}>
+            <RadioGroup value={theme} onChange={(theme) => setThemeWithAnimation(theme)}>
               <div className="p-1">
                 <RadioGroup.Option value="light">
                   <Menu.Item>
