@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import {
   Mail,
   Github,
@@ -9,6 +10,9 @@ import {
   Mastodon,
   Threads,
   Instagram,
+  BiliBili,
+  Juejin,
+  WeChat,
 } from './icons'
 
 const components = {
@@ -22,6 +26,9 @@ const components = {
   mastodon: Mastodon,
   threads: Threads,
   instagram: Instagram,
+  bilibili: BiliBili,
+  juejin: Juejin,
+  wechat: WeChat,
 }
 
 type SocialIconProps = {
@@ -34,10 +41,22 @@ const SocialIcon = ({ kind, href, size = 8 }: SocialIconProps) => {
   if (
     !href ||
     (kind === 'mail' && !/^mailto:[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(href))
-  )
+  ) {
     return null
+  }
 
   const SocialSvg = components[kind]
+
+  if (href === '/share/wechat') {
+    return (
+      <Link className="text-sm text-gray-500 transition hover:text-gray-600" href={href}>
+        <span className="sr-only">{kind}</span>
+        <SocialSvg
+          className={`fill-current text-gray-700 hover:text-primary-500 dark:text-gray-200 dark:hover:text-primary-400 h-${size} w-${size}`}
+        />
+      </Link>
+    )
+  }
 
   return (
     <a
